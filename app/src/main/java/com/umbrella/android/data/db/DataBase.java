@@ -3,11 +3,13 @@ package com.umbrella.android.data.db;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -43,14 +45,11 @@ public class DataBase {
 
     //CREATE Network n (id INTEGER PRIMARY KEY, network BLOB);
     public void Save() { //сохранить
-        File file = new File("path");
-
-        byte[] b = new byte[(int) file.length()];
-        try {
-            FileInputStream fileInputStream = new FileInputStream(file);
-            fileInputStream.read(b);
-            writeDB(b);
-            System.out.println("Все ок!");
+        /*if ()
+        try(ByteArrayOutputStream b = new ByteArrayOutputStream()){
+            try(ObjectOutputStream o = new ObjectOutputStream(b)){
+                o.writeObject(obj);
+            }
         } catch (FileNotFoundException e) {
             System.out.println("File Not Found.");
             e.printStackTrace();
@@ -59,7 +58,7 @@ public class DataBase {
             e1.printStackTrace();
         } catch (SQLException | ClassNotFoundException throwables) {
             throwables.printStackTrace();
-        }
+        }*/
     }
 
     public void writeDB(byte[] b) throws ClassNotFoundException, SQLException {

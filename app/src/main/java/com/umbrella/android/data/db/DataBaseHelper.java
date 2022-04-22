@@ -18,8 +18,8 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 
 public class DataBaseHelper extends SQLiteOpenHelper {
-    private static String DB_NAME = "network.db";
-    private static String DB_PATH = "";
+    private static String DB_NAME = "Network.db";
+    private static String DB_PATH = "C:\\Users\\avkur\\Downloads\\Android_db\\Android\\app\\src\\main\\assets\\Network.db";
     private static final int DB_VERSION = 1;
 
     private SQLiteDatabase mDataBase;
@@ -28,10 +28,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     public DataBaseHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
-        if (android.os.Build.VERSION.SDK_INT >= 17)
-            DB_PATH = context.getApplicationInfo().dataDir + "/databases/";
-        else
-            DB_PATH = "/data/data/" + context.getPackageName() + "/databases/";
         this.mContext = context;
 
         copyDataBase();

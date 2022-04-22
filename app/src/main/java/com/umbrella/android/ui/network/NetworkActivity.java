@@ -48,6 +48,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectOutputStream;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -72,7 +73,6 @@ public class NetworkActivity extends AppCompatActivity {
     private static final String RPROP = "RProp";
     private static final String BACKPROP = "BackProp";
     private static String flagAlgorithm;
-    private DataBase dataBase;
 
     public static String getFlagAlgorithm() {
         return flagAlgorithm;
@@ -92,7 +92,7 @@ public class NetworkActivity extends AppCompatActivity {
         return imageForView;
     }
 
-    private SQLiteDatabase mDb;
+    private SQLiteDatabase mDb =null;
     private DataBaseHelper dataBaseHelper;
 
     private static ImageView imageForView;
@@ -103,6 +103,9 @@ public class NetworkActivity extends AppCompatActivity {
     private void init() throws SQLException, ClassNotFoundException, IOException {
         dataBaseHelper = new DataBaseHelper(this);
         mDb = dataBaseHelper.getWritableDatabase();
+        if(mDb != null){
+            System.out.println("К бд подключились");
+        }
         numberHiddenEditText = binding.filedNumberHidden;
         numberCycleEditText = binding.filedNumberCycle;
         learningRateEditText = binding.filedCoeffStudy;
@@ -180,38 +183,39 @@ public class NetworkActivity extends AppCompatActivity {
         binding.buttonSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 if (NetworkDataSource.getNetwork() == null) {
                     openSiteDialog();
                 } else {
-                   // dataBaseHelper.Save();
-                    File file = new File("path");
+                    // dataBaseHelper.Save();
 
-                    byte[] b = new byte[(int) file.length()];
+                    Network network = NetworkDataSource.getNetwork();
+                    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
                     try {
-                        FileInputStream fileInputStream = new FileInputStream(file);
-                        fileInputStream.read(b);
-                        System.out.println("Все ок!");
-                    } catch (FileNotFoundException e) {
-                        System.out.println("File Not Found.");
+                        ObjectOutputStream o = new ObjectOutputStream(bos);
+                        System.out.println("Сохранение 1/2");
+                        o.writeObject(network);
+                        byte[] b = bos.toByteArray();
+                        String sql = "Insert into Network(id, network) Values('" + b + "');";
+                        mDb.execSQL(sql);
+                        System.out.println("Сохранение 2/2");
+                        // Cursor cursor = "Insert into Network(id, network) Values(" + k + ",'" + b + "');";
+                        //TODO фигачь тут БД
+                    } catch (IOException e) {
                         e.printStackTrace();
-                    } catch (IOException e1) {
-                        System.out.println("Error Reading The File.");
-                        e1.printStackTrace();
                     }
-                    String sql = "Insert into Network(id, network) Values('" + b + "');";
-                    mDb.execSQL(sql);
-//        PreparedStatement pstmt = conn.prepareStatement(sql);
-//        pstmt.executeUpdate();
-                    System.out.println("Все ок!");
-                   // Cursor cursor = "Insert into Network(id, network) Values(" + k + ",'" + b + "');";
-                    //TODO фигачь тут БД
+
+
                 }
+
+
             }
         });
         binding.buttonDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (NetworkDataSource.getNetwork() == null) {
+               /* if (NetworkDataSource.getNetwork() == null) {
                     openSiteDialog();
                 } else {
                     try {
@@ -220,17 +224,17 @@ public class NetworkActivity extends AppCompatActivity {
                         throwables.printStackTrace();
                     }
                     //TODO фигачь тут БД
-                }
+                }*/
             }
         });
         binding.buttonUpload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                try {
-                    dataBase.Update();
+               /*try {
+                    //dataBase.Update();
                 } catch (SQLException | ClassNotFoundException throwables) {
                     throwables.printStackTrace();
-                }
+                }*/
                 //TODO фигачь тут БД
             }
         });
@@ -347,7 +351,7 @@ public class NetworkActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
                     }
-                 //   serialization.readImageForView();
+                    //   serialization.readImageForView();
                     //serialization.readImage(imageView.getTag().toString());
                     serialization.readImageForTesting();
                     try {
@@ -539,7 +543,8 @@ public class NetworkActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent
+            imageReturnedIntent) {
         super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
         switch (requestCode) {
             case pick_image:
